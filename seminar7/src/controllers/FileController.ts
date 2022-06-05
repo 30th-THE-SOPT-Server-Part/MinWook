@@ -24,6 +24,10 @@ const uploadFileToS3 = async (req: Request, res: Response) => {
     }
 }
 
+const uploadFilesToS3 = async (req: Request, res: Response) => {
+    if(!req.files) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST));
+}
+
 export default {
     uploadFileToS3
 }
