@@ -4,6 +4,7 @@ import { MovieCreateDto } from "../interfaces/movie/MovieCreateDto";
 import { MovieCommentInfo, MovieInfo } from "../interfaces/movie/MovieInfo";
 import { MovieOptionType } from "../interfaces/movie/MovieOptionType";
 import { MovieResponseDto } from "../interfaces/movie/MovieResponseDto";
+import { MoviesResponseDto } from "../interfaces/movie/MoviesResponseDto";
 import Movie from "../models/Movie";
 
 const createMovie = async (movieCreateDto: MovieCreateDto):Promise<PostBaseResponseDto> =>{
@@ -76,8 +77,8 @@ const updateMovieComment = async (movieId: string, commentId: string, userId: st
     }
 }
 
-const getMovieBySearch = async(search: string, option: MovieOptionType, page: number): Promise<MovieResponseDto[]> =>{
-    const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
+const getMoviesBySearch = async(search: string, option: MovieOptionType, page: number): Promise<MoviesResponseDto> =>{
+    const regex = (pattern: string) => new RegExp(`.*{pattern}.*`);
 
     let movies: MovieInfo[] = [];
     const perPage: number = 2;
@@ -92,15 +93,15 @@ const getMovieBySearch = async(search: string, option: MovieOptionType, page: nu
                         .skip(perPage * (page -1))
                         .limit(perPage);
         }else if(option === 'director'){
-            movies = await Movie.find({title: {$regex: titleRegex}})
+            movies = await Movie.find({director: {$regex: titleRegex}})
                         .sort({createdAt: -1})
                         .skip(perPage * (page -1))
                         .limit(perPage);
         }else{
             movies = await Movie.find({
-                $or: [
-                    {director: { $regex: titleRegex}},
-                    {title: {$regex: titleRegex}}
+                $or: [//둘 중에 하나라도 만족하게
+                    {title: { $regex: titleRegex}},
+                    {director: {$regex: titleRegex}}
                 ]
             })
             .sort({createdAt: -1})
@@ -111,7 +112,12 @@ const getMovieBySearch = async(search: string, option: MovieOptionType, page: nu
         const total: number = await Movie.countDocuments({});
         const lastPage: number = Math.ceil(total/perPage);
 
-        return movies;
+        const data = {
+            movies,
+            lastPage
+        }
+        
+        return data;
     } catch (error) {
         console.log(error);
         throw error;
@@ -123,5 +129,5 @@ export default{
     createMovieComment,
     getMovie,
     updateMovieComment,
-    getMovieBySearch
+    getMoviesBySearch
 }
