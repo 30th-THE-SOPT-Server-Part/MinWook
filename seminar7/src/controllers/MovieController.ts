@@ -2,7 +2,7 @@ import express, {Request, Response} from "express";
 import statusCode from "../modules/statusCode";
 import message from "../modules/responseMessage";
 import util from "../modules/util";
-import { validationResult } from "express-validator/check";
+import { validationResult } from "express-validator";
 import { MovieCreateDto } from "../interfaces/movie/MovieCreateDto";
 import MovieService from "../services/MovieService";
 import { MovieCommentCreateDto } from "../interfaces/movie/MovieCommentCreateDto";
