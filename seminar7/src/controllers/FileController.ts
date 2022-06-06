@@ -5,6 +5,7 @@ import util from "../modules/util";
 import FileService from "../services/FileService";
 
 
+
 const uploadFileToS3 = async (req: Request, res: Response) => {
     
     if(!req.file){
@@ -39,6 +40,10 @@ const uploadFilesToS3 = async (req: Request, res: Response) => {
                 originalname: image.originalname
             };
         }));
+
+        const data = await FileService.createFiles(imageList);
+
+        res.status(statusCode.CREATED).send(util.success(statusCode.CREATED,message.CREATE_FILE_SUCCESS,data));
     } catch (error) {
         console.log(error);
         res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
@@ -46,5 +51,6 @@ const uploadFilesToS3 = async (req: Request, res: Response) => {
 }
 
 export default {
-    uploadFileToS3
+    uploadFileToS3,
+    uploadFilesToS3
 }
