@@ -36,7 +36,7 @@ const createReview = async (req: Request, res: Response) =>{
 }
 
 /**
- *  @route GET /review/movies/:movieId
+ *  @route GET /review/movies/:movieId?search=&option=&page=
  *  @desc Get Review
  *  @access Public
  */
