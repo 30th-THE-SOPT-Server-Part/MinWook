@@ -41,9 +41,8 @@ const uploadFilesToS3 = async (req: Request, res: Response) => {
                 originalname: image.originalname
             };
         }));
-        console.log('에러에러에러');
+        
         const data = await FileService.createFiles(imageList);
-        console.log('dasdsaasddsasdasddsasdasd');
         
         res.status(statusCode.CREATED).send(util.success(statusCode.CREATED,message.CREATE_FILE_SUCCESS,data));
     } catch (error) {
