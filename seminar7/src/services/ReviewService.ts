@@ -2,7 +2,7 @@ import { PostBaseResponseDto } from "../interfaces/common/PostBaseResponseDto";
 import { ReviewCreateDto } from "../interfaces/review/ReviewCreateDto";
 import { ReviewInfo } from "../interfaces/Review/ReviewInfo";
 import { ReviewOptionType } from "../interfaces/review/ReviewOptionType";
-import { ReviewResponseDto } from "../interfaces/review/ReviewResponseDto";
+import { ReviewsResponseDto } from "../interfaces/review/ReviewsResponseDto";
 import Review from "../models/Review";
 
 const createReview = async (movieId: string, reviewCreateDto: ReviewCreateDto): Promise<PostBaseResponseDto> =>{
@@ -28,7 +28,7 @@ const createReview = async (movieId: string, reviewCreateDto: ReviewCreateDto): 
     }
 }
 
-const getReviews = async (movieId: string, search: string, option: ReviewOptionType, page: number): Promise<ReviewResponseDto> =>{
+const getReviews = async (movieId: string, search: string, option: ReviewOptionType, page: number): Promise<ReviewsResponseDto> =>{
     const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
 
     let reviews: ReviewInfo[] = [];
@@ -40,14 +40,13 @@ const getReviews = async (movieId: string, search: string, option: ReviewOptionT
         if(option === 'title'){
             reviews = await Review.find({title: {$regex: pattern}})
                         .where('movie').equals(movieId)
-                        .populate('writer')
+                        .populate(['movie', 'writer'])
                         .sort({createdAt: -1})
                         .skip(perPage * (page - 1))
                         .limit(perPage);
         } else if(option === 'content'){
-            reviews = await Review.find({title: {$regex: pattern}})
+            reviews = await Review.find({content: {$regex: pattern}})
                         .where('movie').equals(movieId)
-                        .populate('writer')
                         .sort({createdAt: -1})
                         .skip(perPage * (page - 1))
                         .limit(perPage);
@@ -59,28 +58,33 @@ const getReviews = async (movieId: string, search: string, option: ReviewOptionT
                 ]
             })
             .where('movie').equals(movieId)
-            .populate('writer')
             .sort({createdAt: -1})
             .skip(perPage * (page - 1))
             .limit(perPage);
         }
 
-        const total = await Review.countDocuments({});
+        const total = await Review.countDocuments({ movie: movieId }); //특정 영화에대한 리뷰조회
         const lastPage: number = Math.ceil(total/perPage);
 
-    
-        const data = await Promise.all(reviews.map((review: any) => {
-            
-            const result = {
-                writer: review.writer.name,
-                movie: review.movie,
-                title: review.title,
-                content: review.content
-            };
-            return result;
-        }));
+        const data = {
+            reviews,
+            lastPage
+        }
 
         return data;
+    
+        // const data = await Promise.all(reviews.map((review: any) => {
+            
+        //     const result = {
+        //         writer: review.writer.name,
+        //         movie: review.movie,
+        //         title: review.title,
+        //         content: review.content
+        //     };
+        //     return result;
+        // }));
+
+        // return data;
 
     } catch (error) {
         console.log(error);
