@@ -28,7 +28,7 @@ const createFile = async(link: string, fileName: string): Promise<FileResponseDt
             const data = await Promise.all(imageList.map(async image => {
                 const file = new File({
                     link: image.location,
-                    filename: image.originalname
+                    fileName: image.originalname
                 });
                 
                 await file.save();
@@ -38,7 +38,7 @@ const createFile = async(link: string, fileName: string): Promise<FileResponseDt
                     link: file.link
                 };
             }));
-
+            
             return data;
 
         } catch (error) {
