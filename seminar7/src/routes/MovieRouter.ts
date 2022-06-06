@@ -10,7 +10,7 @@ router.post('/', [
     body('director').notEmpty()
 ], MovieController.createMovie);
 
-router.get('/', MovieController.getMovieBySearch);
+router.get('/', MovieController.getMoviesBySearch);
 
 router.post('/:movieId/comment',[
     body('writer').notEmpty(),
